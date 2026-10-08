@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VECTOR-CORE — Big Rig Tycoon: Research &amp; Game Blueprint</title>
+<style>
+  :root{
+    --asphalt:#14161a;
+    --asphalt-2:#1b1e24;
+    --panel:#21252c;
+    --panel-2:#272c34;
+    --line:#333a44;
+    --amber:#ffab2e;
+    --amber-dim:#c98a2a;
+    --rust:#d4552b;
+    --chrome:#c9d1d9;
+    --paper:#e8e3d9;
+    --muted:#9aa4b0;
+    --green:#57c07a;
+    --red:#e0574f;
+    --blue:#5aa9e6;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--asphalt);color:var(--paper);
+    font-family:var(--sans);font-size:17px;line-height:1.62;
+    -webkit-text-size-adjust:100%;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px 100px}
+  a{color:var(--amber)}
+  a:hover{color:#ffcb6b}
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    background:
+      radial-gradient(1200px 340px at 15% -10%, rgba(255,171,46,.22), transparent 60%),
+      radial-gradient(900px 300px at 90% 0%, rgba(212,85,43,.16), transparent 60%),
+      linear-gradient(180deg,#111318 0%, #191c22 100%);
+    border-bottom:1px solid var(--line);
+    padding:56px 0 42px;
+  }
+  .kicker{font-family:var(--mono);font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber-dim);margin:0 0 14px}
+  h1{font-size:clamp(30px,5.2vw,54px);line-height:1.06;margin:0 0 10px;letter-spacing:-.02em;font-weight:800}
+  h1 .sub{display:block;font-size:.44em;font-weight:600;color:var(--muted);letter-spacing:.02em;margin-top:14px}
+  .logline{font-size:clamp(17px,2.2vw,21px);color:var(--chrome);max-width:60ch;margin:16px 0 0}
+  .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{font-family:var(--mono);font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:rgba(255,255,255,.02)}
+  .chip b{color:var(--chrome);font-weight:600}
+
+  /* ---------- NAV ---------- */
+  nav.toc{position:sticky;top:0;z-index:50;background:rgba(20,22,26,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav.toc .inner{max-width:1080px;margin:0 auto;padding:9px 22px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+  nav.toc .inner::-webkit-scrollbar{display:none}
+  nav.toc a{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:7px 10px;border-radius:7px;white-space:nowrap}
+  nav.toc a:hover{background:var(--panel);color:var(--amber)}
+
+  /* ---------- STRUCTURE ---------- */
+  section{padding:52px 0 6px;border-top:1px solid var(--line);margin-top:44px}
+  section:first-of-type{border-top:none;margin-top:24px}
+  h2{font-size:clamp(23px,3.4vw,33px);line-height:1.15;margin:0 0 6px;letter-spacing:-.015em}
+  h2 .num{font-family:var(--mono);font-size:.5em;color:var(--amber-dim);display:block;letter-spacing:.2em;margin-bottom:10px;font-weight:500}
+  h3{font-size:20px;margin:34px 0 8px;letter-spacing:-.01em}
+  h4{font-size:16.5px;margin:24px 0 6px;color:var(--chrome)}
+  p{margin:12px 0}
+  .lede{font-size:19px;color:var(--chrome);max-width:74ch}
+  ul,ol{margin:12px 0;padding-left:22px}
+  li{margin:6px 0}
+  strong{color:#fff}
+  em{color:var(--chrome)}
+  code{font-family:var(--mono);font-size:.88em;background:var(--panel-2);padding:2px 6px;border-radius:5px;color:var(--amber)}
+
+  /* ---------- COMPONENTS ---------- */
+  .callout{border-left:3px solid var(--amber);background:linear-gradient(90deg,rgba(255,171,46,.09),rgba(255,171,46,0));padding:16px 20px;border-radius:0 10px 10px 0;margin:22px 0}
+  .callout.rust{border-color:var(--rust);background:linear-gradient(90deg,rgba(212,85,43,.1),rgba(212,85,43,0))}
+  .callout.green{border-color:var(--green);background:linear-gradient(90deg,rgba(87,192,122,.09),rgba(87,192,122,0))}
+  .callout p:first-child{margin-top:0}.callout p:last-child{margin-bottom:0}
+
+  .answer{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 26px 8px;margin:26px 0}
+  .answer h3{margin-top:0}
+  .answer .row{display:grid;grid-template-columns:170px 1fr;gap:14px;padding:13px 0;border-top:1px solid var(--line)}
+  .answer .row:first-of-type{border-top:none}
+  .answer .row dt{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-dim);padding-top:3px}
+  .answer .row dd{margin:0}
+
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15.5px;display:block;overflow-x:auto;white-space:normal}
+  thead th{text-align:left;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-dim);border-bottom:2px solid var(--line);padding:9px 12px;font-weight:600;vertical-align:bottom}
+  tbody td{border-bottom:1px solid #262b33;padding:10px 12px;vertical-align:top}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  td.num,th.num{font-family:var(--mono);white-space:nowrap}
+
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:20px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+  .card h4{margin-top:0}
+  .card p:last-child{margin-bottom:0}
+
+  .vector{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 12px 12px 0;padding:18px 20px;margin:14px 0}
+  .vector .vid{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--amber);text-transform:uppercase}
+  .vector h4{margin:4px 0 6px;font-size:18px;color:#fff}
+  .vector .ev{font-size:14.5px;color:var(--muted);margin:8px 0 0;font-family:var(--mono);line-height:1.5}
+  .vector .impl{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:15.5px}
+
+  .loop{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:0 18px 16px;margin:18px 0;overflow-x:auto}
+  .loop pre{margin:16px 0 0;font-family:var(--mono);font-size:13px;line-height:1.5;color:var(--chrome);white-space:pre}
+
+  .settle{background:#0d0f12;border:1px solid var(--line);border-radius:10px;padding:18px 20px;font-family:var(--mono);font-size:13.5px;line-height:1.75;color:var(--chrome);overflow-x:auto;white-space:pre;margin:18px 0}
+  .settle .pos{color:var(--green)}.settle .neg{color:var(--red)}.settle .hl{color:var(--amber);font-weight:700}
+
+  .persona{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;margin:22px 0}
+  .persona .role{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-dim)}
+  .persona h3{margin:6px 0 4px;font-size:24px}
+  .persona .ql{font-style:italic;color:var(--chrome);border-left:2px solid var(--amber-dim);padding-left:14px;margin:14px 0}
+
+  .two-col{columns:2;column-gap:34px}
+  @media(max-width:760px){.two-col{columns:1}.answer .row{grid-template-columns:1fr;gap:2px}}
+
+  .pill{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:rgba(255,171,46,.13);color:var(--amber);border:1px solid rgba(255,171,46,.3)}
+  .pill.g{background:rgba(87,192,122,.12);color:var(--green);border-color:rgba(87,192,122,.3)}
+  .pill.r{background:rgba(224,87,79,.12);color:var(--red);border-color:rgba(224,87,79,.3)}
+  .pill.b{background:rgba(90,169,230,.12);color:var(--blue);border-color:rgba(90,169,230,.3)}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px}
+  .stat .v{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--amber);line-height:1.1}
+  .stat .l{font-size:13.5px;color:var(--muted);margin-top:7px;line-height:1.4}
+  .stat .s{font-size:11.5px;color:#6f7885;margin-top:6px;font-family:var(--mono)}
+
+  footer{border-top:1px solid var(--line);margin-top:60px;padding-top:28px;color:var(--muted);font-size:14.5px}
+  .srcs{font-size:14px;color:var(--muted);font-family:var(--mono);line-height:1.75}
+  hr{border:none;border-top:1px solid var(--line);margin:34px 0}
+  @media print{
+    body{background:#fff;color:#111}
+    nav.toc{display:none}
+    section{border-top:1px solid #ccc;page-break-inside:avoid}
+    .card,.vector,.persona,.answer,.stat{background:#fafafa}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">VECTOR-CORE · Deep Research Package · October 2026</p>
+    <h1>BIG RIG TYCOON
+      <span class="sub">A game designed for the American owner-operator —<br>built from the demographic vectors up.</span>
+    </h1>
+    <p class="logline">Three linked studies: <strong>(1)</strong> who single owner-operators and micro-fleet
+      managers actually are, <strong>(2)</strong> the most specific genre of mobile/browser game that cohort
+      will play for months, <strong>(3)</strong> human models built from that data — and the game blueprint
+      they demand.</p>
+    <div class="meta-row">
+      <span class="chip"><b>91.5%</b> of U.S. carriers run ≤10 trucks</span>
+      <span class="chip"><b>53%</b> run exactly one</span>
+      <span class="chip"><b>56</b> avg owner-operator age</span>
+      <span class="chip"><b>28%</b> report loneliness</span>
+      <span class="chip"><b>3.5 hrs</b> average dock wait</span>
+      <span class="chip"><b>$2.26</b> cost/mile vs <b>$1.88</b> rate</span>
+      <span class="chip"><b>3.8★</b> incumbent, 50M downloads</span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="inner">
+    <a href="#answer">The Answer</a>
+    <a href="#study1">Study 1 · Demographics</a>
+    <a href="#study2">Study 2 · Genre</a>
+    <a href="#study3">Study 3 · Personas</a>
+    <a href="#blueprint">Blueprint</a>
+    <a href="#systems">Systems</a>
+    <a href="#story">Story</a>
+    <a href="#style">Style &amp; UX</a>
+    <a href="#money">Money</a>
+    <a href="#layers">Broader Lens</a>
+    <a href="#portfolio">One vs. Many</a>
+    <a href="#sources">Sources</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================= ANSWER ================= -->
+<section id="answer">
+  <h2><span class="num">THE ANSWER, UP FRONT</span>What type is it, what does the player do, and what's the story</h2>
+
+  <div class="answer">
+    <h3>The game</h3>
+    <div class="row">
+      <dt>Exact genre</dt>
+      <dd><strong>Idle Freight Tycoon</strong> — an idle/incremental business-management simulator with a
+        <strong>card-draft “load board” decision layer</strong> and <strong>asynchronous “convoy” social
+        competition.</strong> Store category: Idle Tycoon / Management Sim (midcore-casual).</dd>
+    </div>
+    <div class="row">
+      <dt>Platform &amp; session</dt>
+      <dd>Android + iOS native and a browser/PWA build. Portrait, one thumb. <strong>90 seconds minimum,
+        4–12 minutes typical, 20-minute deep session optional.</strong> 8–14 sessions a day is the
+        expected behaviour, not the aspiration. Fully playable offline for 72 hours.</dd>
+    </div>
+    <div class="row">
+      <dt>What the player does</dt>
+      <dd>Reads a freight board and drafts a load. Wins a rate by negotiating (<em>the Handshake</em>).
+        Routes the haul against an 11-hour drive clock, fuel prices, weather and weigh stations.
+        Assigns a driver — sometimes himself. Watches the rig roll and the money accrue while he's
+        away. Buys a trailer, a second truck, a third driver. Reads a clean settlement sheet every
+        Friday. Grows from one truck to a terminal — then decides what happens to his name on the door.</dd>
+    </div>
+    <div class="row">
+      <dt>What it is not</dt>
+      <dd>Not a driving sim (no twitch, no GPU, no 1.5 GB download). Not a slot machine
+        (no RNG gambling, no loot boxes). Not a game about being a victim of the freight market —
+        it's a game about <em>running</em> one.</dd>
+    </div>
+    <div class="row">
+      <dt>Story</dt>
+      <dd>Delivered as <strong>AM talk radio</strong>. Eight chapters — one per freight season — hosted by
+        <em>Preacher</em>, the mentor who left you his truck, his spot on the load board and $18,000 of
+        debt. Each chapter draws another driver's story out of the night, and the anthology becomes a
+        single fight against <strong>Meridian Logistics</strong>, a faceless mega-carrier buying up lanes
+        and buying up your hometown truck stop.</dd>
+    </div>
+    <div class="row">
+      <dt>Why it wins</dt>
+      <dd>Card is the <strong>highest daily-playtime genre for men aged 40–49</strong> (≈26 min/day);
+        strategy is the <strong>most age-stable motivation</strong> in gaming; idle is the only mechanic
+        that literally mirrors a trucker's life (<em>you were gone and the money still came in</em>);
+        and async social is the only way to give the loneliest workforce in America belonging
+        without adding one more obligation. The incumbent truck game has 50M downloads and a
+        <strong>3.8★</strong> rating — the demand exists and the service doesn't.</dd>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p><strong>The single sentence:</strong> an idle freight tycoon where a 56-year-old owner-operator
+    gets to run the trucking business that should have been his — where the clock obeys him, the
+    brokers pay, and the number at the end of the week is honest.</p>
+  </div>
+</section>
+
+<!-- ================= STUDY 1 ================= -->
+<section id="study1">
+  <h2><span class="num">STUDY 1</span>The demographics of the American owner-operator</h2>
+  <p class="lede">Who exactly is the single owner-operator and micro-fleet manager — and which
+  overlapping traits are strong enough to build a product against?</p>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="v">~92%</div><div class="l">of U.S. truck drivers are men</div><div class="s">BLS / datausa / ATRI</div></div>
+    <div class="stat"><div class="v">56</div><div class="l">average age of an owner-operator (was 50 twenty years ago)</div><div class="s">ATRI 2025</div></div>
+    <div class="stat"><div class="v">72%</div><div class="l">of owner-operators are married</div><div class="s">OOIDA Foundation 2024</div></div>
+    <div class="stat"><div class="v">1 in 3</div><div class="l">owner-operators has served in the military (26–36%)</div><div class="s">OOIDA; Census</div></div>
+    <div class="stat"><div class="v">~14%</div><div class="l">hold a college degree vs ~50% of the U.S. workforce</div><div class="s">datausa / ATRI</div></div>
+    <div class="stat"><div class="v">$64.5k</div><div class="l">average owner-operator net income, 2024–25 (+2.5% YoY)</div><div class="s">ATBS</div></div>
+    <div class="stat"><div class="v">94,000</div><div class="l">miles driven per year, average owner-operator</div><div class="s">ATBS</div></div>
+    <div class="stat"><div class="v">MS&nbsp;1.57<br>TN&nbsp;1.49</div><div class="l">highest state location quotients for drivers (Texas is #1 by count)</div><div class="s">BLS 2026</div></div>
+  </div>
+
+  <h3>The five strongest overlapping vectors</h3>
+  <p>These are the intersections where <strong>three or more independent sources agree</strong>.
+  They are the load-bearing traits — the <em>VECTOR-CORE</em> — that any product must satisfy.</p>
+
+  <div class="vector">
+    <div class="vid">Vector 1</div>
+    <h4>Male, Gen X, 50–58, married, veteran household, South/Midwest, rural-adjacent</h4>
+    <p class="ev">~92% male · modal owner-operator band 51–60 (59% of OOIDA members) · 72% married ·
+      26–36% veterans · location quotients MS 1.57 / TN 1.49 / TX 1.12</p>
+    <p class="impl">A man in the last decade of a thirty-year career. He entered the trade at ~26, has
+      a spouse, a mortgage and a truck note, and he is planning to retire at 70. <strong>Design at him
+      and design for his wife and daughter too</strong> — they're in the cab, on the phone and in the
+      dispatch chair.</p>
+  </div>
+
+  <div class="vector">
+    <div class="vid">Vector 2</div>
+    <h4>Time-rich, attention-poor, device-constrained</h4>
+    <p class="ev">3.5-hour average dock wait · detention on 39.3% of stops · 117–209 hours a year detained ·
+      ~14 hours a week waiting · 10-hour rest break · ~63% Android · patchy rural signal</p>
+    <p class="impl">“<em>I have sixty minutes but I cannot give you sixty seconds of undivided
+      attention.</em>” The entire session architecture comes from this single sentence.</p>
+  </div>
+
+  <div class="vector">
+    <div class="vid">Vector 3</div>
+    <h4>Stressed, isolated, responsibility-loaded, self-reliant</h4>
+    <p class="ev">27.9% report loneliness · 26.9% depression · 20.6% chronic sleep problems ·
+      14.5% anxiety · 4.78 hours of sleep per 24 · $2.26/mile cost against a $1.88/mile spot rate</p>
+    <p class="impl">The fantasy must be <strong>relief and control</strong>, never more pressure. This
+      is also the ethical boundary of the whole design: this audience is vulnerable. Do not sell a
+      lonely man the cure for loneliness — just refuse to make him lonelier.</p>
+  </div>
+
+  <div class="vector">
+    <div class="vid">Vector 4</div>
+    <h4>Proud, independent, status-seeking, institutionally distrustful</h4>
+    <p class="ev">Independence/set-own-hours outranks healthcare and retirement as a motive ·
+      only 29.3% of carriers collect the detention fees they bill · 44% of facilities won't let a
+      driver use a bathroom · 94.5% of fleets bill detention; fewer than half of those invoices are paid</p>
+    <p class="impl"><strong>Respect is the currency and pity is poison.</strong> He is the boss. The
+      villain is the system that eats drivers — never the driver.</p>
+  </div>
+
+  <div class="vector">
+    <div class="vid">Vector 5</div>
+    <h4>Numerate, uncredentialed expert, allergic to being sold to</h4>
+    <p class="ev">14% college-educated but full P&amp;L fluency — IFTA, CSA scores, insurance class,
+      cost per mile · driver-app surveys name forced password changes, 2FA and freezing apps as top
+      irritants · competitor reviews publicly punish greedy monetisation</p>
+    <p class="impl">He will understand anything if it's explained; he will abandon anything that
+      condescends, obfuscates or interrupts. <strong>Transparency is a feature.</strong></p>
+  </div>
+
+  <h3>Conflict log — read this before quoting any number</h3>
+  <table>
+    <thead><tr><th>Claim</th><th>Why sources disagree</th><th>How to use it</th></tr></thead>
+    <tbody>
+      <tr><td class="num">O/O avg age 46</td><td>Zippia and careers sites blend all “owner/operator” roles, including non-trucking businesses</td><td>Discard for trucking. Use <strong>51–58</strong>.</td></tr>
+      <tr><td class="num">O/O avg age 56</td><td>ATRI 2024 industry data, owner-operator self-report</td><td>Primary figure</td></tr>
+      <tr><td class="num">Women 4%</td><td>ATRI — Class A CDL holders only</td><td>Use for long-haul Class A</td></tr>
+      <tr><td class="num">Women 9.5%</td><td>Women in Trucking — all professional drivers</td><td>Use for professional drivers</td></tr>
+      <tr><td class="num">Women 33.2%</td><td>Zippia — includes non-trucking owner/operator roles</td><td>Discard</td></tr>
+      <tr><td class="num">White 72% vs 63%</td><td>Older dataset vs ATRI's 2024 ten-year trend</td><td>Use 63% plus the trend line</td></tr>
+      <tr><td class="num">Veterans 10% vs 34%</td><td>All truckers vs owner-operators/OOIDA members</td><td>Both, labelled</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= STUDY 2 ================= -->
+<section id="study2">
+  <h2><span class="num">STUDY 2</span>Which game genre this cohort actually plays</h2>
+  <p class="lede">The strongest vectors from Study 1 were run against platform data, genre
+  engagement by age, monetisation behaviour and a competitor teardown. One sub-genre survived.</p>
+
+  <h3>Daily minutes per genre, by age</h3>
+  <table>
+    <thead><tr><th>Genre</th><th class="num">0–19</th><th class="num">20–29</th><th class="num">30–39</th><th class="num">40–49</th><th class="num">50+</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Card</strong></td><td class="num">19.1</td><td class="num">22.8</td><td class="num">25.3</td><td class="num"><strong>25.8</strong></td><td class="num"><strong>25.5</strong></td></tr>
+      <tr><td>Casino</td><td class="num">13.4</td><td class="num">15.8</td><td class="num">18.9</td><td class="num">20.4</td><td class="num">19.8</td></tr>
+      <tr><td>Puzzle</td><td class="num">15.5</td><td class="num">16.8</td><td class="num">20.3</td><td class="num">21.4</td><td class="num">21.5</td></tr>
+      <tr><td>Strategy</td><td class="num">21.7</td><td class="num">21.4</td><td class="num">21.9</td><td class="num">22.4</td><td class="num">20.4</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Read:</strong> for a man in his late forties or fifties, <em>card mechanics are the single
+  highest-time genre</em> — and strategy is the flattest, most age-proof line on the chart. Quantic
+  Foundry's research agrees: <strong>competition appeal declines sharply with age; strategy does not.</strong></p>
+
+  <h3>The verdict on each candidate genre</h3>
+  <table>
+    <thead><tr><th>Candidate</th><th>Fit</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td><strong>3D truck driving sim</strong></td><td>Authentic, but demands twitch steering, a strong GPU, 1.5 GB installs and undivided attention. The incumbent has <strong>50M+ downloads at 3.8★</strong> and is publicly hated for forced ads and a subscription “as expensive as a real load board.” He already drives eleven hours a day — he does not want to re-drive his shift while exhausted.</td><td><span class="pill r">Reject as core</span><br>Visual flavour only</td></tr>
+      <tr><td>Match-3 puzzle</td><td>Best raw reach; majority-female audience; no thematic connection to the persona; zero moat.</td><td><span class="pill r">Reject</span></td></tr>
+      <tr><td>4X base-builder</td><td>Async, cohort-based, no twitch, 55–77% male, proven with older men — but the fantasy is warlord, not trucker, and build timers frustrate a clock-dominated player.</td><td><span class="pill b">Adopt its social architecture</span></td></tr>
+      <tr><td>Social casino / slots</td><td>Perfect demographic match (45–54 is the largest single band; 60% of the audience is 36–70) and the strongest monetisation DNA in mobile. But 40% of slot players report feeling addicted at least occasionally, and this cohort is stressed, isolated and financially squeezed.</td><td><span class="pill r">Reject the math</span><br>Keep the collection &amp; event cadence</td></tr>
+      <tr><td>Card roguelite / deckbuilder</td><td>Highest daily time for this age band; truckers <em>self-report playing Balatro at the docks</em>; zero twitch; offline-clean; tiny install. Weakness: pure roguelites reset progress, which fights the “come back and find more than you left” need.</td><td><span class="pill g">Adopt as the decision layer</span></td></tr>
+      <tr><td><strong>Idle / incremental tycoon</strong></td><td>Audience skews older and broader than twitch genres; attracts players who like optimisation, math and slow-burn progress; male-dominated when themed industrially. Its core promise — <em>you were away and you still earned</em> — is a literal mirror of the owner-operator's life.</td><td><span class="pill g">Adopt as the core</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout green">
+    <p><strong>The synthesis — the exact sub-genre:</strong> <em>Idle Freight Tycoon</em> = an idle
+    business-management sim (AdVenture Capitalist / Idle Miner Tycoon economics) + a card-draft load
+    board (Balatro-grade decision density, MONOPOLY GO-grade satisfaction) + async convoy competition
+    (Clash of Clans architecture, zero obligation) + the authenticity of the American Truck Simulator
+    community. Store keywords: <code>truck</code> <code>tycoon</code> <code>idle</code>
+    <code>empire</code> <code>business sim</code>.</p>
+  </div>
+
+  <h3>The competitor gap is the moat</h3>
+  <table>
+    <thead><tr><th>Competitor</th><th>Scale</th><th>The gap</th></tr></thead>
+    <tbody>
+      <tr><td>Truck Simulator USA (Ovilex)</td><td class="num">50M+ downloads<br>518K reviews · 3.8★</td><td>Reviews complain about ads on <em>pause</em>, a monthly charge “as expensive as a real load board,” metres in an American truck sim, paywalled upgrades. They built the demand and abandoned the service.</td></tr>
+      <tr><td>American Truck Simulator (SCS)</td><td>Large, loyal, older community</td><td>Needs a PC or console and 20–60 focused minutes. Not a dock-wait game. Its community proves the appetite for authenticity.</td></tr>
+      <tr><td>Coin Master / MONOPOLY GO</td><td class="num">$650M – $1.58B/yr</td><td>Proves a collection + async raid + seasonal event loop with a casual, older-leaning, non-twitch audience can top the charts — with no trucking content at all.</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Nobody has built a game for truckers that a trucker would recognise as true.</strong>
+  That is an uncrowded, defensible position, and the entire audience is reachable through a handful
+  of high-trust channels: trucker Facebook groups, r/Truckers, trucking YouTube, Overdrive / Land Line /
+  CCJ, truck-stop geofenced ad inventory, and podcast ad reads — which this cohort over-indexes on.</p>
+</section>
+
+<!-- ================= STUDY 3 ================= -->
+<section id="study3">
+  <h2><span class="num">STUDY 3</span>Human models — the hypothetical target customers</h2>
+  <p class="lede">Two phases. <strong>Concentrated first:</strong> two composites drawn only from the
+  five highest-confidence vectors, to fix the game's spine. <strong>Broadened second:</strong> seven
+  edge cases that each still repeat across independent data — these add layers, not forks.</p>
+
+  <h3>Phase A · The concentrated core</h3>
+
+  <div class="persona">
+    <div class="role">Core persona 1 · the solo owner-operator</div>
+    <h3>“MULE” — Ray Boudreaux, 56</h3>
+    <p class="ql">A man in the last decade of a thirty-year career who owns the truck, the debt and the
+      responsibility — and who is quietly terrified the margin disappears before he can stop.</p>
+    <table>
+      <tbody>
+        <tr><td><strong>Home</strong></td><td>22 acres outside a town of 4,100, between Memphis and Jackson — the Mississippi/Tennessee corridor (location quotients 1.57 and 1.49)</td></tr>
+        <tr><td><strong>Family</strong></td><td>Married 27 years; a son in the Army, a daughter in community college; a black Lab named Diesel rides along</td></tr>
+        <tr><td><strong>Background</strong></td><td>Six years Army motor transport (88M); high-school diploma plus a semester of community college</td></tr>
+        <tr><td><strong>Business</strong></td><td>2006 Kenworth T680 with 812,000 miles; own authority since 2016; dry van on the spot market; ~105,000 miles a year; ~$232k gross, ~$68k net</td></tr>
+        <tr><td><strong>Economics</strong></td><td>All-in cost ~$1.92/mile; freight is paying ~$1.88. He is running hard to stand still.</td></tr>
+        <tr><td><strong>Device</strong></td><td>Samsung Galaxy A-series, cracked screen protector, an 8 GB data plan he watches</td></tr>
+        <tr><td><strong>Media</strong></td><td>Classic country, sports talk, true-crime podcasts, dashcam YouTube, the weather channel</td></tr>
+      </tbody>
+    </table>
+    <p><strong>His day, in his numbers:</strong> up at 04:40 in the bunk; eleven hours of driving inside a
+      fourteen-hour window, of which two to four hours are <em>not</em> driving; 3.5 hours average at
+      docks and receivers — which is his principal entertainment window; 5–6:30 pm is his longest
+      uninterrupted leisure block of the day; lights out at nine, with maybe ninety awake minutes on
+      the phone in the dark.</p>
+    <p><strong>What he wants and cannot have:</strong> to be paid for his time, to stop being invisible,
+      and margin he can defend. <em>The fantasy is not more driving — it is margin without the grind.</em></p>
+    <p><strong>How he'll punish you:</strong> one forced ad on the settlement screen and he's gone, and
+      he'll tell four hundred people in a Facebook group. One winking cartoon mascot and he'll call it
+      a kids' game. One forty-minute session requirement and it's deleted by Tuesday.</p>
+  </div>
+
+  <div class="persona">
+    <div class="role">Core persona 2 · the micro-fleet manager who still drives</div>
+    <h3>“TRIANGLE” — Denise “Two-Bar” Whitaker, 47</h3>
+    <p class="ql">Runs three trucks, a kitchen-table dispatch office and her own shift behind the wheel —
+      the operational brain of a 3-to-10-truck carrier, which is 22% of all U.S. carriers.</p>
+    <table>
+      <tbody>
+        <tr><td><strong>Business</strong></td><td>Three power units — dry van plus one reefer; factoring; CSA-score-obsessed; insurance renewal is her personal Super Bowl</td></tr>
+        <tr><td><strong>Family</strong></td><td>Married to a driver who now runs local; two teenagers still at home (40% of female drivers have kids under 18 at home)</td></tr>
+        <tr><td><strong>Play style</strong></td><td>Puzzles and word games; plays to <em>decompress</em>, not to compete; hates pressure timers</td></tr>
+        <tr><td><strong>Why she matters</strong></td><td>She is the proof the game must span <em>driver</em> and <em>operator</em>. If the only fantasy is driving, you lose her; if the only fantasy is spreadsheets, you lose Ray. The 1-truck → 3-truck → 10-truck spine lets both play the same game on the same day at different points on the arc.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>The spec sheet the core product must satisfy</h4>
+  <table>
+    <thead><tr><th>Requirement</th><th>Derived from</th></tr></thead>
+    <tbody>
+      <tr><td>Sessions of 90 sec – 20 min, resumable mid-decision</td><td>3.5-hr waits, 10-hr breaks, interrupt-driven work</td></tr>
+      <tr><td>Zero forced ads; zero play-blocking energy gates</td><td>52% quit after disruptive ads; competitor review record</td></tr>
+      <tr><td>Offline-capable, &lt;130 MB, Android-first, low battery</td><td>Dead zones, older devices, watched data plans</td></tr>
+      <tr><td>Real cost-per-mile economics, explained on screen</td><td>Numerate, uncredentialed expert</td></tr>
+      <tr><td>Big type, one thumb, sunlight-readable, no twitch</td><td>Cab phone mounts, direct sun, age</td></tr>
+      <tr><td>Idle accrual — earnings while away</td><td>Mirrors the mile</td></tr>
+      <tr><td>The player is the boss, never the victim</td><td>Status hunger, institutional distrust</td></tr>
+      <tr><td>Deep rig customisation</td><td>Craft and machine pride</td></tr>
+      <tr><td>Belonging without obligation — no voice chat, no raid schedule</td><td>Loneliness without appetite for social debt</td></tr>
+      <tr><td>Story delivered as radio</td><td>Eleven hours a day of AM/FM, podcasts and audiobooks</td></tr>
+      <tr><td>No gambling mechanics</td><td>Ethics, audience vulnerability, review risk</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Phase B · The broadened lens — edge cases with repeat data</h3>
+  <p>Each of these sits outside the tight core but recurs across independent datasets. Each becomes a
+  <strong>layer inside the same game</strong>. (Expanded in the <a href="#layers">Broader Lens</a> section.)</p>
+  <table>
+    <thead><tr><th>#</th><th>Edge cohort</th><th>The repeating data</th><th>Layer it creates</th></tr></thead>
+    <tbody>
+      <tr><td class="num">B1</td><td><strong>Female long-haul owner-operator</strong></td><td>4.1% of Class A CDL but 9.5% of professional drivers; median age 46; 65% married; 58% rural; 40% with kids under 18; detention on 49% of their stops vs 39% overall</td><td>Home-Time Promise · safety-weighted routing · a women's convoy chapter</td></tr>
+      <tr><td class="num">B2</td><td><strong>Hispanic / immigrant owner</strong></td><td>Hispanic drivers 19% → 23% with a sharp 2021 inflection; 56.1% Mexican origin; Laredo is the #1 border port at ~$20B</td><td>Spanish as a first-class language · family-authority mechanic · cross-border lanes</td></tr>
+      <tr><td class="num">B3</td><td><strong>Veteran driver</strong></td><td>26% of owner-operators served (other sources: 34%); all truckers ~10%, double the national rate</td><td>Convoy Ops mode · commendations and ribbons · battle-buddy pairing</td></tr>
+      <tr><td class="num">B4</td><td><strong>Gen Z entrant</strong></td><td>Gen Z is 7.5% of drivers; only 20% under 35 vs 35% of the workforce; ATRI calls this a workforce crisis</td><td>Apprentice mode · mentorship that pays in reputation · shareable vertical clips</td></tr>
+      <tr><td class="num">B5</td><td><strong>Near-retirement operator</strong></td><td>Planned retirement age 70; average owner-operator age 56 and rising; Gen X + Boomers are 62% of the workforce</td><td>Hang Up the Keys endgame · persistent Legacy score</td></tr>
+      <tr><td class="num">B6</td><td><strong>Specialty haulers</strong></td><td>Livestock 93.2% small fleet, ag 91.6%, auto transport 89.6%, logs 89.3%; reefer detention 56.2% of stops vs flatbed 26.2%; tanker $2.75/mi, hazmat $3.25/mi</td><td>One equipment vertical per season, each with genuinely different mechanics</td></tr>
+      <tr><td class="num">B7</td><td><strong>Teams, spouses and pets</strong></td><td>~60% of drivers travel with a pet; 72–93% of carriers are 1–2 trucks where the spouse often dispatches; female drivers 65% married vs 55% of men</td><td>Two-Shift Team idle mode · Spouse Dispatcher hire · Axle the dog</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= BLUEPRINT ================= -->
+<section id="blueprint">
+  <h2><span class="num">THE BLUEPRINT · 1 OF 4</span>Pillars, loops and the shape of play</h2>
+
+  <h3>The five pillars</h3>
+  <div class="grid2">
+    <div class="card"><h4>1 · Respect the trade</h4><p>Real economics, real geography, real equipment,
+      real vocabulary. No jokes at the driver's expense. He's the boss, never the punchline.</p></div>
+    <div class="card"><h4>2 · Your time <em>is</em> the resource</h4><p>Ninety-second sessions. No forced
+      ads. No play-blocking timers. Offline-first and interruption-proof. The game earns his minute;
+      it never takes it.</p></div>
+    <div class="card"><h4>3 · Decisions, not reflexes</h4><p>Deterministic strategy and card-draft
+      decisions. Zero twitch, zero reaction tests, zero timed taps. Mastery means better judgment —
+      which is how he already thinks about his job.</p></div>
+    <div class="card"><h4>4 · The clock is the villain, and you can beat it</h4><p>Hours-of-service is the
+      tension of the early game and the <em>relief</em> of the late game. The win condition of the
+      fantasy is getting out of the driver's seat.</p></div>
+    <div class="card"><h4>5 · Nobody hauls alone</h4><p>Async belonging with zero obligation: no voice
+      chat, no scheduled raids, no social debt. A convoy you can leave for three days and come back to.</p></div>
+  </div>
+
+  <h3>Three nested loops</h3>
+
+  <div class="loop">
+    <h4>Loop 1 — The Minute · 90 sec – 4 min · <em>the dock wait</em></h4>
+<pre>
+  OPEN THE BOARD → DRAFT 1 OF 3–5 LOAD CARDS → NEGOTIATE
+       │                   │                        │
+  pick truck &amp;       compare rate/mile,      THE HANDSHAKE: drag
+  driver              deadhead, weight,       to counter the broker.
+                      window, detention       Win = more money.
+                      risk, broker rating     Lose = he moves on.
+       │
+  PLAN THE RUN → fuel stop · weigh station · split break · weather
+       │
+  HAMMER DOWN → the rig rolls. Miles and dollars accrue in real time.
+       │
+  DELIVER → collect, rate the receiver, learn which customers lie.
+</pre>
+    <p style="font-size:15px;color:var(--muted)">One session = <strong>3 to 8 meaningful decisions</strong>.
+    Same decision density as a hand of Balatro — except every card is a load and the numbers are real.</p>
+  </div>
+
+  <div class="loop">
+    <h4>Loop 2 — The Week · 5–20 min · <em>the business</em></h4>
+<pre>
+  fuel hedging · maintenance windows · DOT inspections · insurance renewal
+  hiring &amp; firing · repair vs. replace · factoring vs. waiting 45 days
+  a lane going cold because a mega-carrier undercut you
+  produce season opening in Florida · a blizzard closing I-80
+
+  ── while you're away ──────────────────────────────────────────
+  idle accrual = (rate/mile − cost/mile) × miles driven
+</pre>
+    <p style="font-size:15px;color:var(--muted)">This is the idle layer — and it is the only idle
+    mechanic that is <em>literally true</em> to a trucker's life: he was out on the road for eleven
+    hours and the money piled up without him.</p>
+  </div>
+
+  <div class="loop">
+    <h4>Loop 3 — The Career · weeks to months · <em>the authority</em></h4>
+<pre>
+  LEASED-ON DRIVER → OWN AUTHORITY → 2 TRUCKS → 5 → 10 → TERMINAL
+        (MC number)      (prestige 1)              each AUTHORITY RESET
+                                                   widens the game and
+                                                   grants permanent Legacy perks
+        ↓
+     . . . . . . . . . . .  HANG UP THE KEYS  . . . . . . . . . . .
+</pre>
+    <p style="font-size:15px;color:var(--muted)">The endgame is not a bigger number. It's deciding what
+    your name on the door means after you stop driving.</p>
+  </div>
+</section>
+
+<!-- ================= SYSTEMS ================= -->
+<section id="systems">
+  <h2><span class="num">THE BLUEPRINT · 2 OF 4</span>The systems, in detail</h2>
+
+  <h3>The Load Board — the card layer, and the beating heart of the game</h3>
+  <p>Every load is a card. Every card carries attributes a trucker already argues about for a living:</p>
+  <table>
+    <thead><tr><th>Attribute</th><th>Meaning in play</th></tr></thead>
+    <tbody>
+      <tr><td>Origin → destination</td><td>Real freight corridors with real lane economics</td></tr>
+      <tr><td>Loaded miles / deadhead miles</td><td>Deadhead is paid at full cost — <em>the</em> skill check</td></tr>
+      <tr><td>Weight</td><td>Fuel burn, mountain grades, scale risk</td></tr>
+      <tr><td>Commodity</td><td>Produce, dry goods, steel, chemicals, livestock, auto, hazmat</td></tr>
+      <tr><td>Rate &amp; rate/mile</td><td>The number he negotiates in real life</td></tr>
+      <tr><td>Appointment window</td><td>Tight windows = detention risk + clock pressure</td></tr>
+      <tr><td>Receiver reputation ★</td><td>The player learns which customers waste his day</td></tr>
+      <tr><td>Detention risk</td><td>A visible probability informed by that receiver's history (39.3% of stops; 14 hrs/week in reality)</td></tr>
+      <tr><td>Broker rating</td><td>Pays fast, pays fair, or ghosts — only 29.3% of detention invoices are ever collected</td></tr>
+      <tr><td>Equipment required</td><td>Van · reefer · flatbed · step-deck · tanker · hotshot</td></tr>
+      <tr><td>Backhaul potential</td><td>Chaining a return load is the core strategic skill</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Your deck is literally your book of business.</strong> Every broker relationship, dedicated
+  lane and contract you earn becomes a permanent card. <em>Spot</em> pays more and varies wildly;
+  <em>contract</em> pays less and always shows up. Building a deck that survives a soft market is the
+  whole long-term strategy — and it is exactly the advice owner-operators give each other.</p>
+  <p><strong>Combos:</strong> <em>Triangulation</em> (three loads forming a loop) · <em>Backhaul</em> ·
+  <em>Dedicated Lane</em> (repeat a lane three times for a rate bonus) · <em>Seasonal Spike</em>
+  (haul produce out of Lakeland in April for a multiplier).</p>
+  <p><strong>Rarity is earned, never gambled:</strong> Bronze → Iron → Silver → <strong>Gold Seal</strong>
+  → <strong>Black Book</strong>. No gacha. Rarity comes from reputation and relationships.</p>
+
+  <h3>The Clock — hours-of-service as the tension engine</h3>
+  <ul>
+    <li>The 11-hour drive / 14-hour on-duty clock is a <strong>visible physical dial</strong> on the HUD.</li>
+    <li>Every load consumes clock. Bad routes strand you. Running hot raises fatigue risk, which raises
+      repair, insurance and safety-score consequences.</li>
+    <li><strong>Emotional arc:</strong> in Chapter 1 the clock rules you. By Chapter 4 you've hired a
+      second driver and the clock belongs to someone else. By Chapter 8 you haven't thought about it in weeks.</li>
+    <li><strong>Never punitive:</strong> fatigue costs money, it never ends the game. A game about a man's
+      real livelihood must not kill him for being tired.</li>
+  </ul>
+
+  <h3>The Lane Market — a living economy</h3>
+  <ul>
+    <li><strong>Regional rate model</strong> driven by the documented freight calendar: Q1 recession →
+      spring produce (FL/CA) → summer construction flatbed → fall harvest → Q4 retail peak.</li>
+    <li><strong>Two economies:</strong> spot ($1.88–2.13/mile, volatile) versus contract (steady, lower).</li>
+    <li><strong>Global modifiers:</strong> diesel price, load-to-truck ratio, a mega-carrier entering a
+      lane, a port strike, a hurricane rebuild.</li>
+    <li><strong>Your decisions move your own market</strong> — dominating a lane raises your rate there
+      and degrades competitors', exactly as spot-market capacity works.</li>
+    <li><strong>A permanent “Where the Money Goes” panel:</strong> fuel $0.48/mile, truck payment $0.39,
+      maintenance $0.198, insurance $0.102. Teaching is respect.</li>
+  </ul>
+
+  <h3>Trucks &amp; equipment — every truck is a character</h3>
+  <table>
+    <thead><tr><th>Class</th><th>Role in progression</th></tr></thead>
+    <tbody>
+      <tr><td>Day cab / box truck</td><td>Chapter-1 starter: local runs, low cost, low ceiling</td></tr>
+      <tr><td>Hotshot (pickup + gooseneck)</td><td>Cheap entry into high-rate freight — the rookie on-ramp</td></tr>
+      <tr><td>Used Class 8 sleeper</td><td>The workhorse: cheap to buy, expensive to keep</td></tr>
+      <tr><td>New Class 8 sleeper</td><td>Reliable, desirable, and a financing obligation that follows you</td></tr>
+      <tr><td>Specialty trailers</td><td>Reefer, flatbed, step-deck, tanker, car hauler, livestock, end dump</td></tr>
+    </tbody>
+  </table>
+  <p>Each truck carries a real service history, its own failure modes, and an odometer that visibly
+  climbs. <strong>Players will name their trucks.</strong> That is free retention. Upgrades — APU, aero
+  kit, tyres, re-gearing, ELD, dashcam, fridge, bunk, CB, inverters — each cost real money and return a
+  real-world benefit.</p>
+
+  <h3>Drivers &amp; the Terminal — the “get out of the seat” system</h3>
+  <p>Hiring is the game's central progression and its emotional payoff.</p>
+  <ul>
+    <li><strong>Named hires with arcs</strong>, drawn from the Phase-B edge cases: <strong>Renata</strong>
+      (reefer specialist) · <strong>Hector</strong> (family authority, cross-border) ·
+      <strong>Six</strong> (veteran, convoy ops) · <strong>Deej</strong> (rookie, succession) ·
+      <strong>Hoss</strong> (near retirement, legacy).</li>
+    <li><strong>Procedural drivers with legible traits</strong> — <em>Steady, Speedster, Homebody, Fixer,
+      Talker</em> — plus real-world quirks: the man who refuses night runs; the one who's brilliant in
+      the mountains; the one who keeps failing inspections.</li>
+    <li><strong>The Spouse Dispatcher</strong> hire boosts settlement efficiency — a real small-fleet pattern.</li>
+    <li><strong>The Terminal</strong> grows with you: a gravel lot → a rented yard → a shop with your name
+      on it → your own fuel island. <strong>The player can photograph his own name on the door.</strong></li>
+  </ul>
+
+  <h3>Settlement Friday — the most important screen in the game</h3>
+  <div class="settle">  ═══════════════════════════════════════════════════════
+   SETTLEMENT — WEEK 14            BLUE BONNET HAULING LLC
+  ═══════════════════════════════════════════════════════
+   Gross revenue                          <span class="pos">$  19,480</span>
+   Fuel                                   <span class="neg">−$   4,610</span>
+   Truck payment                          <span class="neg">−$   1,760</span>
+   Insurance                              <span class="neg">−$     455</span>
+   Maintenance &amp; tires                    <span class="neg">−$     980</span>
+   Factoring fee                          <span class="neg">−$     312</span>
+   Permits, tolls, lumpers                <span class="neg">−$     204</span>
+  ───────────────────────────────────────────────────────
+   <span class="hl">NET                                   $  11,159    ✓</span>
+   Miles driven                               8,910
+   Your cost per mile                     <span class="hl">$   0.934</span>
+  ═══════════════════════════════════════════════════════</div>
+  <p>This is the emotional destination of the entire game: <strong>the honest number real life never
+  delivers.</strong> It exports as a clean, shareable image. A settlement card posted into a trucker
+  Facebook group is worth more than any ad buy — this is the game's organic marketing engine and its
+  weekly cultural ritual.</p>
+
+  <h3>Progression currencies, and how failure is handled</h3>
+  <table>
+    <thead><tr><th>Currency</th><th>Earned by</th><th>Spent on</th></tr></thead>
+    <tbody>
+      <tr><td>Cash</td><td>Hauling</td><td>Everything</td></tr>
+      <tr><td>Reputation</td><td>Clean runs, on-time delivery, contracts completed</td><td>Premium brokers, dedicated lanes, hires</td></tr>
+      <tr><td>Safety Score</td><td>Speed, fatigue, inspection outcomes, maintenance discipline</td><td>Insurance rates, authority tiers, hazmat endorsements</td></tr>
+      <tr><td>Miles</td><td>Driving</td><td>The literal scoreboard</td></tr>
+      <tr><td>Legacy</td><td>Prestige resets and chapter decisions</td><td>Permanent multipliers that survive every reset</td></tr>
+    </tbody>
+  </table>
+  <p><strong>Failure with dignity:</strong> run the business into the ground and you don't get a “Game
+  Over” — you <em>take a job at Meridian Logistics for a season.</em> You keep your handle, your
+  knowledge and your dog, and you earn your way back out. Roughly 88,000 trucking authorities were
+  revoked in 2023 alone; a comeback arc is the most authentic story available, and infinitely kinder
+  than a fail screen.</p>
+
+  <h3>Collections — the Wall, the Codex and the Handshake Book</h3>
+  <ul>
+    <li><strong>The Slang Codex</strong> — a collectible encyclopedia of CB and highway culture:
+      <em>bear in the air, chicken coop, bobtail, hammer down, four-wheeler, county mounty.</em>
+      <strong>This is the bridge that makes the game work for non-truckers:</strong> they learn the
+      language as a reward; truckers get the pleasure of recognition. It doubles as an organic social
+      asset.</li>
+    <li><strong>The Wall</strong> — a trophy wall in the terminal: state plates from all 48, shipper
+      coffee mugs, a scale ticket from every state, a framed first dollar, photographs of every truck
+      you've owned.</li>
+    <li><strong>The Handshake Book</strong> — every broker you've beaten, logged with the final rate.
+      Pure flex. Pure shareability.</li>
+  </ul>
+
+  <h3>The Convoy — social, asynchronous, obligation-free</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>How it works</th><th>Why it fits</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Your handle is your username</strong></td><td>You pick a CB handle at first launch; it's your identity everywhere</td><td>Instant identity and word-of-mouth currency: <em>“What's your handle?”</em></td></tr>
+      <tr><td><strong>Convoys</strong> (guilds)</td><td>5–50 drivers pool resources for a shared terminal upgrade</td><td>Belonging with no raid schedule</td></tr>
+      <tr><td><strong>Convoy Lane Push</strong></td><td>A shared weekly goal: hold one corridor's rate together</td><td>The fantasy of drivers organising — CB-organised stoppages are documented history</td></tr>
+      <tr><td><strong>Handshake Board</strong></td><td>Post your best negotiation of the week</td><td>Low-pressure boasting — the trade's favourite pastime</td></tr>
+      <tr><td><strong>Ghost Convoys</strong></td><td>Race a convoy-mate's recorded haul up the same lane</td><td>Competition with zero scheduling</td></tr>
+      <tr><td><strong>The channel</strong></td><td>Text-only chat in 10-4 format, per convoy, moderated</td><td>Feels native to the culture; safe and simple</td></tr>
+      <tr><td><strong>Mentorship</strong></td><td>Veterans earn Reputation for teaching rookies</td><td>Turns the ageing workforce into the heroes of the story</td></tr>
+    </tbody>
+  </table>
+
+  <h3>The Endorsement Tree — progression that needs no explanation</h3>
+  <p>The skill tree is the real CDL endorsement list — instantly legible, authentic, and endlessly
+  expandable.</p>
+  <table>
+    <thead><tr><th>Branch</th><th>Path</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Core</strong></td><td>Class A → Doubles/Triples → Tanker → Hazmat → Tank+Hazmat → Oversize/Heavy Haul → Auto Transport → Reefer cert → Food-grade → Logbook mastery → Split sleeper → Recap hours → the 34-hour reset</td></tr>
+      <tr><td><strong>Business</strong></td><td>Own Authority → Broker relations → Direct shipper contracts → Factoring → Net-30 discipline → Your own invoicing → Lease-purchase → Fleet financing → Terminal ownership</td></tr>
+      <tr><td><strong>Legacy</strong></td><td>2nd truck → 5 trucks → 10 trucks → Dispatcher → Terminal → Hang Up the Keys</td></tr>
+    </tbody>
+  </table>
+  <p>Each endorsement unlocks <strong>real freight with real constraints</strong>: hazmat opens $3.25/mile
+  loads and closes routes; oversize pays the most and demands escorts and permits; reefers carry their
+  sector's detention penalty (56% of stops) but win the produce season outright.</p>
+</section>
+
+<!-- ================= STORY ================= -->
+<section id="story">
+  <h2><span class="num">THE BLUEPRINT · 3 OF 4</span>The story: “The Hammer Down Show”</h2>
+
+  <div class="callout">
+    <p><strong>The delivery mechanic is the innovation:</strong> the story arrives <em>as radio.</em>
+    Each chapter unfolds in 60–90 second episodes of a late-night AM call-in program that plays while
+    the game idles, with a written logbook transcript for the majority who play muted. It costs almost
+    nothing to produce, it is the exact medium this audience consumes eleven hours a day, and it turns
+    the game's downtime into appointment listening.</p>
+  </div>
+
+  <p><strong>The frame:</strong> <em>The Hammer Down Show</em> is hosted by <strong>Preacher</strong> —
+  the mentor who taught you the trade, and who left you his truck, his spot on the load board and
+  $18,000 of debt. Each chapter, the show draws another driver's story out of the night. The anthology
+  slowly becomes a single plot.</p>
+
+  <table>
+    <thead><tr><th class="num">#</th><th>Chapter</th><th>The turn</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>“Borrowed Time”</strong><br><span class="pill b">Winter · slow season</span></td><td>You inherit a 2007 Freightliner, a CB handle and a note: <em>“Don't haul cheap. Haul smart.”</em> You learn the board, lose money, and find out what deadhead really costs.</td></tr>
+      <tr><td class="num">2</td><td><strong>“Detention”</strong><br><span class="pill b">Early spring</span></td><td>Nine hours at a receiver who won't take your call. You learn that billing detention and <em>collecting</em> it are two different things. Your first act of defiance: refusing a load.</td></tr>
+      <tr><td class="num">3</td><td><strong>“Produce”</strong><br><span class="pill b">Spring · FL/CA</span></td><td>Reefer rates spike. You meet <strong>Renata</strong>, who out-earns you and won't let you forget it. You buy your first trailer and learn that the best money in trucking is seasonal and unforgiving.</td></tr>
+      <tr><td class="num">4</td><td><strong>“Second Seat”</strong><br><span class="pill g">Summer · construction</span></td><td><strong>The pivot.</strong> You hire your first driver. The clock stops ruling you. The moment the truck rolls without you in it is the emotional centre of the entire game.</td></tr>
+      <tr><td class="num">5</td><td><strong>“The Shakedown”</strong><br><span class="pill b">Late summer</span></td><td>A broker ghosts you on a $14,000 invoice. You meet the antagonist properly: <strong>Meridian Logistics</strong> — buying up lanes, undercutting independents, and now buying the truck stop your father ate breakfast in.</td></tr>
+      <tr><td class="num">6</td><td><strong>“Hard Winter”</strong><br><span class="pill r">Winter · recession</span></td><td>Rates collapse to $1.72/mile. A breakdown, a loan, a divorce in the convoy, a driver who quits on Christmas Eve. You find out whether you're a trucker or a business owner. <em>Players can lose the company here</em> — and take a season at Meridian to buy it back.</td></tr>
+      <tr><td class="num">7</td><td><strong>“The Convoy”</strong><br><span class="pill g">Spring · the stand</span></td><td>With a dozen independent operators you refuse a corridor. The channels light up. Preacher's last broadcast airs. <strong>The thesis:</strong> independence is not the same thing as being alone.</td></tr>
+      <tr><td class="num">8</td><td><strong>“Legacy”</strong><br><span class="pill b">Harvest · endgame</span></td><td>You choose: sell to Meridian and take the money · franchise and put your name on fifty doors · or hand the keys to someone like <strong>Deej</strong>, who is twenty-four and has your old fire. Preacher signs off — and it's your handle on the air next.</td></tr>
+    </tbody>
+  </table>
+
+  <p><strong>Tone law:</strong> the villain is never a driver. The villain is the system that eats
+  drivers. Truckers are the heroes, the rivals and the community. Brokers are individuals — some are
+  snakes, some are decent, and the game makes you learn which is which <em>by playing</em>.</p>
+
+  <div class="callout rust">
+    <p><strong>The ending that matters.</strong> <em>Hang Up the Keys</em> is a real, playable, dignified
+    ending for a man who is statistically 56 years old and knows it. No game has ever given this
+    audience a story about how to be remembered. That is the thing they will tell each other about.</p>
+  </div>
+</section>
+
+<!-- ================= STYLE ================= -->
+<section id="style">
+  <h2><span class="num">THE BLUEPRINT · 4 OF 4</span>Style, sound, accessibility and live-ops</h2>
+
+  <h3>Art direction — “Sun-Faded Americana”</h3>
+  <ul>
+    <li><strong>2D/2.5D painted cards</strong> in a warm dusk palette: amber, rust, sodium-vapour orange,
+      asphalt grey, chrome. <em>1970s truck-stop sign painting</em> and gas-station paperback art,
+      executed in a clean modern UI.</li>
+    <li><strong>The map</strong> is a stylised hand-painted U.S. with real interstate corridors and
+      freight markets — beautiful at a glance, readable at 4.7 inches.</li>
+    <li><strong>Typography:</strong> bold condensed slab letterforms like a sign painter's, but
+      <em>large</em> — body ≥16sp, key numbers ≥24sp. Readability in direct sunlight is a hard art requirement.</li>
+    <li><strong>No mascots, no wide-eyed cartoon face, no winks.</strong> Dignity is the aesthetic.
+      Trucks are drawn with love and are the visual reward of the whole game.</li>
+  </ul>
+
+  <h3>Sound — the radio is a feature, not a soundtrack</h3>
+  <ul>
+    <li><strong>Channels, not tracks:</strong> <em>AM 1170 The Roadhouse</em> (classic country) ·
+      <em>Channel 6</em> (classic rock) · <em>The Talker</em> (sports and call-in) ·
+      <em>Preacher's Show</em> (story) · <em>The Ranch Report</em> (weather and road conditions) ·
+      <em>Static</em> (silence — one of the most evocative sounds in the game).</li>
+    <li><strong>Ambience:</strong> jake brake, air dryer, gravel under tyres, the <em>thunk</em> of a
+      fifth wheel, a reefer cycling, rain on the roof, a CB squelch. The sound design is the authenticity moat.</li>
+    <li><strong>Full mute-viability:</strong> 100% of the game is playable silently, because that is
+      how it will actually be played.</li>
+  </ul>
+
+  <h3>Accessibility spec — non-negotiable</h3>
+  <table>
+    <thead><tr><th>Requirement</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Zero forced interstitials</td><td>52% quit after disruptive ads; it's the #1 complaint about every competitor in this niche</td></tr>
+      <tr><td>Offline-first; 72 hours fully playable without signal</td><td>Dead zones are the norm, not the exception</td></tr>
+      <tr><td>Interruption-proof: kill the app mid-decision and return to the identical state</td><td>Dock lights, phone calls and shippers interrupt constantly</td></tr>
+      <tr><td>Autosave on every tap</td><td>Sessions get lost to a bump in the road</td></tr>
+      <tr><td>One-thumb, bottom-third controls</td><td>The phone is in a windshield mount</td></tr>
+      <tr><td>No timed decisions by default</td><td>Timed decisions are twitch, and twitch excludes this cohort</td></tr>
+      <tr><td>Contrast and size verified on a dashboard at noon</td><td>Ship what survives direct sunlight</td></tr>
+      <tr><td>Never signal with red/green alone — arrows plus the words PAYS / DOESN'T</td><td>Colour-vision deficiency is common in this age band</td></tr>
+      <tr><td>No login wall; guest play is the default and accounts are optional</td><td>Driver surveys name forced password changes and 2FA as top irritants</td></tr>
+      <tr><td>Low-data mode, playable on 200 MB/month; battery under 5%/hour</td><td>Watched data plans; it must charge on a 12V socket while he sleeps</td></tr>
+      <tr><td>“Explain this number” tooltips everywhere</td><td>He's numerate and will not tolerate a black box</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Onboarding — the first five minutes</h3>
+  <ol>
+    <li><strong>0:00 — “What's your handle?”</strong> Pick one or take a generated one. No account, no email.</li>
+    <li><strong>0:20 — A kitchen table, a key, a title and a note.</strong> Preacher's voice on the radio for forty seconds. You own a 2007 Freightliner and $18,000 of debt. No cutscene runs longer than forty seconds.</li>
+    <li><strong>1:00 — Three loads on the board.</strong> One obvious, one trap (the deadhead eats the whole margin), one a genuine risk. <em>The tutorial is the decision.</em> No text walls.</li>
+    <li><strong>2:30 — The Handshake.</strong> You get $2.31/mile instead of $1.88. <em>“I beat the broker.”</em> That is the feeling that brings him back at 4:45 a.m.</li>
+    <li><strong>3:30 — The truck rolls.</strong> 340 miles of I-40 tick past; $784 accrues. You close the app. You're in the bunk.</li>
+    <li><strong>4:00 — It's still running when you wake up</strong> and the dock light is finally green.</li>
+  </ol>
+
+  <h3>Live-ops — the freight calendar is free content structure</h3>
+  <table>
+    <thead><tr><th>Season</th><th>In-game event</th><th>The industry reality it's built on</th></tr></thead>
+    <tbody>
+      <tr><td>Jan–Feb</td><td><em>Slow Season</em> — hard-mode economy, cost-cutting challenges, survival scoring</td><td>Q1 freight recession and rate floors</td></tr>
+      <tr><td>Mar–May</td><td><em>Produce Rush</em> — the reefer vertical unlocks, FL/CA lanes spike</td><td>Produce season and reefer rate spikes</td></tr>
+      <tr><td>Jun–Aug</td><td><em>Build Season</em> — flatbed and oversize, hurricane relief contracts, tarping labour</td><td>Construction and disaster freight</td></tr>
+      <tr><td>Sep–Oct</td><td><em>Harvest</em> — grain and livestock, ag lanes, long-run bonuses</td><td>Midwest harvest surge</td></tr>
+      <tr><td>Nov–Dec</td><td><em>Peak</em> — retail volume, brutal detention, the biggest paychecks of the year</td><td>Q4 retail peak</td></tr>
+      <tr><td>Weekly</td><td><strong>Settlement Friday</strong> — the shareable weekly number and a convoy leaderboard reset</td><td>Weekly settlements are the industry's real rhythm</td></tr>
+      <tr><td>Monthly</td><td><em>The Hammer Down Show</em> episode + a new anthology story</td><td>Radio as narrative delivery</td></tr>
+      <tr><td>Per season</td><td>A new freight vertical, hire, truck, corridor and chapter</td><td>Endless content from public data</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= MONEY ================= -->
+<section id="money">
+  <h2><span class="num">THE MONEY</span>Monetisation: the respect model</h2>
+  <p class="lede">Governing rule: <strong>sell self-expression and convenience — never advantage,
+  never interruption, and never relief from a timer we invented.</strong></p>
+
+  <table>
+    <thead><tr><th>Product</th><th class="num">Price</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Free core</strong></td><td class="num">$0</td><td>A complete, satisfying game playable free indefinitely. Generous by design.</td></tr>
+      <tr><td><strong>“GET YOUR OWN AUTHORITY”</strong></td><td class="num">$7.99 once</td><td>The signature purchase — and the exact dream the audience already has. Unlocks premium broker contracts, an extra slot and premium paint templates, and permanently removes every optional ad prompt. <em>Framed as the real-world dream, priced like a sandwich.</em></td></tr>
+      <tr><td><strong>Rewarded ads</strong></td><td class="num">Free</td><td>Optional only, capped at six per day, <strong>never on the settlement or reward screens.</strong> Framed in-world: <em>“call in a favour to the broker.”</em> ~85% of mobile gamers accept rewarded ads, and rewarded viewers are 4.5× more likely to buy later.</td></tr>
+      <tr><td><strong>The Chrome Shop</strong></td><td class="num">$1.99–14.99</td><td>Paint, chrome, stacks, air horns, lights, dash trinkets, the dog's bandana, your own company logo. Deep, desirable and ethically clean. This is the LTV engine.</td></tr>
+      <tr><td><strong>Terminal Pass</strong></td><td class="num">$4.99 / 8 wks</td><td>A season pass aligned to the real freight calendar. Cosmetic and convenience tracks only — it never gates content the base game needs.</td></tr>
+      <tr><td><strong>Founder's Rig Pack</strong></td><td class="num">$19.99</td><td>Launch-window bundle: a period-correct 1970s paint scheme, a chrome kit, the Preacher's-show audio archive and a permanent 2% fuel discount. Collector value, not power.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout rust">
+    <p><strong>Explicitly forbidden — written into the design document:</strong>
+    loot boxes · gacha · real-money or simulated gambling · energy or lives that block play ·
+    timer-skips sold as relief · pay-to-win stat advantages · forced interstitials · any ad on the
+    settlement screen · notification spam · selling the player's anxiety back to him.</p>
+    <p>This is not only ethics, it is strategy. The audience is small, tight, loud, financially
+    squeezed and deeply suspicious of being farmed. One viral <em>“this game is a ripoff”</em> post
+    inside a 400,000-member trucker Facebook group is an existential event.
+    <strong>Trust is the actual moat.</strong></p>
+  </div>
+</section>
+
+<!-- ================= LAYERS ================= -->
+<section id="layers">
+  <h2><span class="num">BROADENING THE LENS</span>The edge cases, turned into layers</h2>
+  <p class="lede">Rule: an edge case earns its way in only if the trait repeats across independent
+  datasets. Every layer below does — and each is a <em>content drop into the same app</em>, never a fork.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Layer 1 · HOME TIME <span class="pill">female drivers</span></h4>
+      <p><em>Data:</em> 4.1% of Class A CDL but 9.5% of professional drivers; median age 46; 65% married;
+        58% rural; 40% with kids under 18 at home; detention on 49% of their stops versus 39% overall.</p>
+      <p><strong>The Home-Time Promise</strong> — you commit to a date at home and the game scores you
+        against it. Breaking it costs Reputation and visibly degrades family morale; keeping it pays a
+        multiplier. <strong>Safety-weighted routing</strong> makes parking, lighting and facility safety
+        route attributes rather than set dressing — the game never lectures, it prices.
+        <strong>“Sisters of the Road”</strong> is a convoy chapter with its own leaderboard and mentorship
+        network. And a representation standard: the default player is a 56-year-old man, and the art
+        never treats anyone as decoration.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 2 · LA FAMILIA <span class="pill">Hispanic / immigrant owners</span></h4>
+      <p><em>Data:</em> Hispanic drivers 19% → 23% in a decade with a sharp 2021 inflection; 56.1% of
+        Mexican origin; Laredo is the #1 U.S. border port at roughly $20B.</p>
+      <p><strong>Spanish as a first-class language</strong> — a fully authored parallel script including
+        the radio show; same host, two feeds, exactly as real U.S. Spanish-language radio works.
+        <strong>Family Authority</strong> lets you hire relatives with loyalty bonuses and unlocks a family
+        drama questline. A late-game <strong>cross-border vertical</strong> (Laredo / El Paso / Otay Mesa)
+        with customs, bonds and a genuine speed-versus-risk trade-off.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 3 · CONVOY OPS <span class="pill">veterans</span></h4>
+      <p><em>Data:</em> 26% of owner-operators have served (other sources 34%); all truckers ~10% —
+        double the national rate, and trucking stays a destination occupation for veterans even after
+        controlling for age and sex.</p>
+      <p>A procedurally structured mode: mission briefings, staged routes, radio discipline, and a
+        <strong>commendation and ribbon collection</strong> feeding the persistent Legacy score.
+        Deliberately generous timers and unambiguous objectives — designed for people who find procedure
+        calming rather than constraining. A <strong>Battle Buddy</strong> pairing runs two players down
+        the same corridor for a week.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 4 · THE APPRENTICE <span class="pill">Gen Z entrants</span></h4>
+      <p><em>Data:</em> Gen Z is 7.5% of drivers; only 20% of drivers are under 35 versus 35% of the
+        workforce; 6% are under 25; average male entry age is 26. ATRI calls this a workforce crisis.</p>
+      <p><strong>Apprentice mode</strong> starts you as a company driver with no truck: earn the down
+        payment, buy the rig, join the same game from the other end. <strong>Mentorship pays</strong> —
+        veterans earn Reputation for training rookies, which casts the older player as the hero of the
+        younger player's story. Shareable vertical clips of settlement cards, handshake wins and truck
+        builds carry the acquisition for this cohort.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 5 · HANG UP THE KEYS <span class="pill">near-retirement</span></h4>
+      <p><em>Data:</em> planned retirement age 70; owner-operator average age 56 and rising; Gen X plus
+        Boomers are 62% of the workforce and approaching a mass exit; 20+ years in the seat is typical.</p>
+      <p>The endgame choice: sell to Meridian · lease the truck out with your name on it · franchise ·
+        hand the keys to a rookie · or keep running until the wheels come off. A persistent
+        <strong>Legacy Score</strong> survives every prestige reset, and the terminal wall fills with your
+        history. A written, earned, dignified ending — the emotional pinnacle of the product, and it
+        exists nowhere else in the market.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 6 · THE VERTICALS <span class="pill">specialty freight</span></h4>
+      <p><em>Data:</em> livestock 93.2% small-fleet, ag 91.6%, auto transport 89.6%, logs 89.3%,
+        reefer 83.9%; detention by sector — reefer 56.2% of stops, dry van 32.6%, flatbed 26.2%;
+        hazmat pays $3.25/mile.</p>
+      <p><strong>Flatbed</strong> adds tarping and securement labour, permits and wind-load risk.
+        <strong>Reefer</strong> adds temperature logging, a load that can genuinely spoil, and the produce
+        spike. <strong>Tanker and hazmat</strong> gate behind endorsements and push your safety score.
+        <strong>Auto transport</strong> adds damage grading; <strong>livestock</strong> adds live-load
+        urgency. That is eighteen months of live-ops content pulled straight out of public FMCSA data.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 7 · SECOND SEAT <span class="pill">teams, spouses &amp; pets</span></h4>
+      <p><em>Data:</em> ~60% of drivers travel with a pet; 72–93% of carriers are 1–2 trucks where the
+        spouse frequently dispatches; female drivers are 65% married versus 55% of men.</p>
+      <p><strong>Two-Shift Team mode:</strong> while you're offline, your partner drives — the truck never
+        stops. It is the best idle mechanic in the design and it falls straight out of the data.
+        A <strong>Spouse Dispatcher</strong> hire lifts settlement efficiency. And <strong>Axle</strong>,
+        the dog: a morale buff, a customisation slot, a window perch and a quest chain. Highest
+        affection-per-line-of-code in the project.</p>
+    </div>
+
+    <div class="card">
+      <h4>Layer 8 · THE ROAD ITSELF <span class="pill">geography</span></h4>
+      <p><em>Data:</em> location quotients MS 1.57 / TN 1.49 / DE 1.41 / TX 1.12 / LA 1.11; top metros
+        Houston, Chicago, DFW, Atlanta, Memphis; Lakeland→Miami is the busiest intrastate flatbed lane.</p>
+      <p>A stylised real-corridor map (I-10, I-40, I-80, I-95) where freight markets are economic
+        modifiers: produce season, construction season, harvest, winter chain-law zones, and named
+        “black hole” receivers — <em>parodied rather than licensed</em> (Vall-Mart, America-Cold,
+        Kro-Grr, Titan Foods) to stay clear of trademark exposure while remaining instantly legible
+        to the audience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PORTFOLIO ================= -->
+<section id="portfolio">
+  <h2><span class="num">THE PORTFOLIO DECISION</span>One game with depth — or a few games?</h2>
+
+  <div class="callout green">
+    <p><strong>Answer: one game, with depth — plus one satellite that isn't really a game.</strong></p>
+  </div>
+
+  <h3>Why one, in order of weight</h3>
+  <ol>
+    <li><strong>The audience is narrow and identity-tight; networks beat catalogues.</strong> The core is
+      ~3.5M U.S. drivers plus ~1.3M micro-carrier businesses and their families — maybe 6–8M people, of
+      whom 1.5–2.5M are realistic players. Three games split that into thirds and none reaches the
+      critical mass for a convoy system, a weekly settlement ritual or word-of-mouth.</li>
+    <li><strong>The word-of-mouth channel is one pipe carrying one message.</strong> Trucker Facebook
+      groups, r/Truckers, trucking YouTube, OOIDA-adjacent media and truck-stop geofenced ads are
+      concentrated, high-trust and single-message. <em>“Everybody's playing Big Rig Tycoon”</em> is a
+      message. <em>“There are three of these and they're all fine”</em> is not.</li>
+    <li><strong>The genre already has the depth mechanism built in.</strong> An idle tycoon with a card
+      layer scales by adding verticals, seasons and hires — not by shipping new apps. The eight layers
+      above carry the retention of a second product at a fraction of the cost.</li>
+    <li><strong>The edge cases aren't separate markets — they're the same man's life.</strong> Ray has a
+      wife who dispatches, a daughter entering the industry, a veteran buddy, a dog and a retirement
+      date. Splitting those across three apps would be anthropologically wrong.</li>
+    <li><strong>Economics and attention.</strong> One live-ops team, one seasonal calendar, one store
+      presence, one community. Two of three games would die of neglect — and in a trust-driven niche an
+      abandoned game is worse than no game.</li>
+  </ol>
+
+  <h3>The one satellite worth building: <span class="pill g">LOAD BOARD</span> — the daily puzzle</h3>
+  <div class="card">
+    <p><strong>A 60-second daily puzzle. One load. One optimal answer. A shareable result. Free. No ads.</strong></p>
+    <p>Every day a single load card is published. Choose <em>accept · decline · counter</em>. Set the route:
+      fuel stop, break, weigh station. The optimal line depends on rate per mile, deadhead, weight, weather
+      and the clock — all deterministic, all from the same economy engine as the flagship. Results share as
+      a compact grid:</p>
+    <div class="settle"> B I G  R I G   #114
+ 🚚✅ $2.31/mi  •  Deadhead 12 mi  •  Clock +0:40
+ 🟩🟩🟨⬜⬜
+ 3/5 loads won this week</div>
+    <ul>
+      <li><strong>It costs almost nothing</strong> — it reuses the flagship's economy model and card art.</li>
+      <li><strong>It is the best acquisition engine available to this brand.</strong> Wordle's mechanic is
+        shareability inside a tight, talkative community; trucker Facebook groups are exactly that community,
+        and they have a demonstrated appetite for arguing about rate per mile.</li>
+      <li><strong>It doesn't compete</strong> — it's a daily habit that funnels into the flagship.</li>
+      <li><strong>It generates the cleanest possible research dataset:</strong> millions of real decisions
+        about real load economics, which then tunes the flagship's difficulty curve.</li>
+      <li><strong>Forty-five seconds, zero cost, zero ads, zero twitch.</strong> It is the most respectful
+        product anyone could put in front of this audience.</li>
+    </ul>
+  </div>
+
+  <div class="settle" style="white-space:pre-wrap"> SHIP:   Big Rig Tycoon — the flagship: deep, live-ops, one game
+ SHIP:   LOAD BOARD — the free daily puzzle: acquisition funnel + tuning dataset
+ NEVER:  three mid-sized truck games competing for the same thumb</div>
+</section>
+
+<!-- ================= VALIDATION ================= -->
+<section id="validation">
+  <h2><span class="num">DE-RISKING</span>Validation plan, metrics and what could go wrong</h2>
+
+  <h3>Validate before you build</h3>
+  <ol>
+    <li><strong>Thirty in-person intercept interviews at three truck stops</strong> along the
+      Mississippi–Tennessee–Texas corridor (the highest location quotients in the country), with a $20
+      cash incentive — the same method used in the published trucker mental-health literature.</li>
+    <li><strong>Paper-prototype the load board on index cards in a truck stop parking lot.</strong>
+      If a driver doesn't argue with the card, the card is wrong.</li>
+    <li><strong>Ship the load board alone as a web build</strong> — one screen, no art, sixty seconds of
+      play — to 200 drivers recruited from trucker Facebook groups and r/Truckers. Measure only one thing:
+      <em>do they want a second hand?</em></li>
+    <li><strong>Soft launch geofenced</strong> to Mississippi, Tennessee, Texas and Florida, using
+      truck-stop-radius ad buys in the states with the highest driver concentration.</li>
+    <li><strong>The Facebook group test:</strong> post a mocked-up Settlement Friday image. If drivers
+      screenshot it and argue about the numbers, the core emotional beat is validated before a single
+      engineer is hired.</li>
+  </ol>
+
+  <h3>Targets</h3>
+  <table>
+    <thead><tr><th>Metric</th><th class="num">Target</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>Day-1 retention</td><td class="num">≥ 45%</td><td>Narrow, self-identified audience</td></tr>
+      <tr><td>Day-7 retention</td><td class="num">≥ 22%</td><td>Idle-genre benchmarks are high</td></tr>
+      <tr><td>Sessions per day</td><td class="num">≥ 4</td><td>The design is built for the dock wait</td></tr>
+      <tr><td>Median session length</td><td class="num">3–9 min</td><td>It has to fit the window</td></tr>
+      <tr><td>Weekly-active players sharing a settlement</td><td class="num">≥ 8%</td><td>The marketing engine</td></tr>
+      <tr><td>Convoy join rate at D7</td><td class="num">≥ 35%</td><td>Retention and network effect</td></tr>
+      <tr><td>Store rating</td><td class="num">≥ 4.5★</td><td>The real KPI. This audience reviews honestly and loudly.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Risks</h3>
+  <table>
+    <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>“Only truckers will play it.”</td><td>The beachhead is 3.5M U.S. drivers plus 40M+ idle/tycoon players. The Slang Codex makes the culture a reward rather than a barrier, and “own a small business that actually works” is a universal fantasy. The theme also travels: truck-sim culture is enormous in Europe, Brazil and India.</td></tr>
+      <tr><td>Authenticity versus accessibility</td><td>Every industry term is introduced by a decision, never a lecture. Jargon is a collectible, not a gate.</td></tr>
+      <tr><td>Trademark exposure</td><td>Parody shippers and receivers. Actively license two or three real truck OEMs — they market aggressively to this exact demographic and a game partnership is an easy, mutually beneficial sell.</td></tr>
+      <tr><td>Monetisation backlash</td><td>The respect model, a public no-dark-patterns pledge, and an in-game Driver Council recruited from OOIDA and Facebook groups, with a changelog written in the game's voice.</td></tr>
+      <tr><td>Designing at a stressed, isolated audience</td><td>Hard prohibitions on gambling-adjacent mechanics, social-comparison shaming and loss-framed notifications. Mental-health resources surfaced respectfully in the Coffee Shop tab. Do not sell a lonely man the cure for loneliness; just refuse to make him lonelier.</td></tr>
+      <tr><td>Idle games go stale</td><td>The card layer carries the moment-to-moment and the freight calendar carries the year. Eighteen months of content is already sitting in public FMCSA and ATRI data.</td></tr>
+      <tr><td>The incumbent copies it</td><td>They've had 50M downloads and a 3.8★ rating for years. Their monetisation <em>is</em> their product. Copying this design would require rebuilding their company.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ================= SOURCES ================= -->
+<section id="sources">
+  <h2><span class="num">APPENDIX</span>Sources</h2>
+  <p class="srcs">
+    ATRI, <em>Driver Demographics</em> (2025) — age, sex, race, education trends · via Fleet Equipment and Land Line Media<br>
+    OOIDA Foundation, <em>2024 Owner-Operator Survey Report</em> — marriage, veteran status, retirement age, modal age band<br>
+    FMCSA Motor Carrier Management Information System &amp; ATA <em>American Trucking Trends 2025</em> — carrier fleet-size distribution; ~580k active carriers<br>
+    FMCSA carrier census by cargo class — small-fleet share by freight type<br>
+    ATBS — owner-operator net income, revenue per mile, miles per year, 2025 rate environment<br>
+    ATRI, <em>Operational Costs of Trucking</em> (2025) — $2.26/mile and its line items<br>
+    ATRI, <em>Detention Time</em> study (2024) — 39.3% of stops, 117–209 hrs/yr, $15.1B, &lt;50% of invoices paid, female and reefer breakdowns<br>
+    OOIDA, <em>2023 Detention Time Survey</em> — 14 hrs/week; worst-detaining shippers and receivers<br>
+    BLS Occupational Employment &amp; Wage Statistics (SOC 53-3032) and datausa.io — 3,522,076 workers, 7.91% women, age, education<br>
+    BLS, <em>Truck drivers are in it for the long haul</em> (2026) — state location quotients<br>
+    U.S. Census Bureau, <em>America Keeps on Trucking</em> — veterans at 2× the workforce rate; business ownership<br>
+    Sönmez et al., <em>Trucking Organization and Mental Health Disorders of Truck Drivers</em>, Int. J. Environ. Res. Public Health — loneliness 27.9%, depression 26.9%, sleep 20.6%, anxiety 14.5%<br>
+    NIOSH / CDC — occupational suicide risk; FMCSA — 4.78 hrs sleep, fatigue in 13% of crashes<br>
+    Overdrive, <em>State of Surveillance</em> survey — 85% smartphone adoption, cost/benefit ratings<br>
+    Scanbot SDK, <em>Driver App Survey</em> (2024) — 75% app usage, offline failure modes, 2FA friction, 87% tech preference<br>
+    Eleos Technologies — 37% of working truckers on iOS (~63% Android)<br>
+    Truckload Carriers Association — ~60% of drivers travel with a pet<br>
+    ATRI, <em>Motivations for Employment Status</em> (2021) — independence outranks pay and benefits<br>
+    adjoe/Statista, <em>Daily mobile gaming engagement by genre and age</em> (Feb 2024)<br>
+    AdColony/Statista, <em>U.S. casino gaming app players by age</em> (Q2 2020) · Newzoo, <em>Social Casino Consumer Insights</em><br>
+    Attest, <em>Game on: what 2026's gamers are playing</em> · AARP &amp; ESA older-adult gaming data<br>
+    JMIR Serious Games, <em>Mobile Game Design Guide for Middle-Aged and Older Adults</em> · Quantic Foundry, gamer motivation and ageing<br>
+    Deloitte × Google AdMob, <em>Quality Drives Value</em> (2025, n=7,000) — 52% quit after disruptive ads; reward-screen ads triple quit rate<br>
+    Sensor Tower, Business of Apps, mobilegamer.biz — MONOPOLY GO $1.58B (2024), Coin Master, card +18% / puzzle +10% growth<br>
+    Google Play &amp; App Store listings and reader reviews for <em>Truck Simulator USA</em> — 50M+ downloads, 518K reviews, 3.8★<br>
+    r/Truckers and r/OwnerOperators threads on dock-wait behaviour and in-cab entertainment
+  </p>
+  <hr>
+  <p style="color:var(--muted);font-size:14.5px">
+    <strong>VECTOR-CORE</strong> · Research package and game design blueprint · October 2026<br>
+    Companion documents in this repository: <code>research/01-demographic-vectors.md</code> ·
+    <code>research/02-gaming-genre-vectors.md</code> · <code>research/03-persona-models.md</code> ·
+    <code>research/vector-scorecard.csv</code> · <code>design/01-flagship-blueprint.md</code> ·
+    <code>design/02-layers-and-portfolio.md</code>
+  </p>
+</section>
+
+</div>
+</body>
+</html>
