@@ -148,13 +148,19 @@ Priority: **non-negotiable, default-on, cannot be turned off while moving.**
 
 ---
 
-## 11. Open decisions for the owner
+## 11. Decisions
 
-1. **Arcade intensity:** tactical (turn-based or slow-time, closest to Space Lizard) vs. real-time arcade with Steady Hand slow-mo.
-2. **World structure:** open frontier map vs. chaptered story arc vs. both.
-3. **Session length target:** 3–5 minutes per hunt, or longer stages?
-4. **Story tone:** serious frontier noir, cheerful space western, or a balance?
-5. **Lockout thresholds:** confirm the speed threshold and stationary timer, and whether passenger mode should be supported.
+**Resolved by owner:**
+1. **Arcade intensity: Hybrid.** Real-time arcade with telegraphed enemies and an on-demand Steady Hand slow-mo. No reflex-punishing design.
+2. **World structure: Both.** Open frontier map for daily play, with a chaptered warrant spine that unlocks as reputation grows.
+3. **Tone: Balanced, with intellectual dry humor.** Serious stakes, plus:
+   - *Subtle visual incongruities* that are out of place in the frontier setting (for example, an anachronistic object, a cracked piece of Concord signage in an old language, a retro-futuristic tool used for an ancient purpose). These reward attention and stay quiet.
+   - *Scripted character comments* that are deadpan, strategically timed, and witty without being cruel. Humor lands at moments of tension, never during the most serious beats.
+4. **Lockout: No override while moving.** Passengers cannot unlock the game while the vehicle is in motion.
+
+**Still open:**
+5. **Session length target:** 3–5 minute hunts, or longer stages?
+6. **Lockout thresholds:** confirm the ~5 mph speed threshold and 3-minute stationary timer.
 
 ---
 
